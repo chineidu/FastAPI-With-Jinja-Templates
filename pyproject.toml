@@ -8,6 +8,7 @@ dependencies = [
     "aiocache>=0.12.3",
     "asyncpg>=0.31.0",
     "fastapi[standard]>=0.128.8",
+    "gunicorn>=25.0.3",
     "msgspec>=0.20.0",
     "omegaconf>=2.3.0",
     "passlib>=1.7.4",
