@@ -1,0 +1,84 @@
+config:
+  bulkhead_config:
+    queue_timeout_seconds: 2
+    prediction_semaphore_config: # dict of model_type to max concurrent requests
+      # Bulkhead pattern to limit concurrent requests
+      p: 20
+      ner: 10
+
+  api_config:
+    title: ML Router API
+    name: "${.title}"
+    description: A Learning-Focused API Router for Machine Learning Models
+    version: v1.0.0
+    status: healthy
+    prefix: /api/v1
+    auth_prefix: "${.prefix}/auth"
+    middleware:
+      cors:
+        allow_origins:
+          - "*"
+        allow_credentials: true
+        allow_methods:
+          - "*"
+        allow_headers:
+          - "*"
+    ratelimit:
+      {
+        "guest":
+          {
+            "requests_per_minute": 10,
+            "max_concurrent_requests": 1,
+            "special_endpoints":
+              {
+                "/predict/ner": { "limit": 2, "period": 60 },
+                "/predict/sentiment": { "limit": 5, "period": 60 },
+              },
+          },
+        "free":
+          {
+            "requests_per_minute": 60,
+            "max_concurrent_requests": 5,
+            "special_endpoints":
+              {
+                "/predict/ner": { "limit": 5, "period": 60 },
+                "/predict/sentiment": { "limit": 10, "period": 60 },
+              },
+          },
+        "plus":
+          {
+            "requests_per_minute": 200,
+            "max_concurrent_requests": 10,
+            "special_endpoints":
+              {
+                "/predict/ner": { "limit": 20, "period": 60 },
+                "/predict/sentiment": { "limit": 100, "period": 60 },
+              },
+          },
+        "pro":
+          {
+            "requests_per_minute": 1000,
+            "max_concurrent_requests": 50,
+            "special_endpoints":
+              {
+                "/predict/ner": { "limit": 100, "period": 60 },
+                "/predict/sentiment": { "limit": 500, "period": 60 },
+              },
+          },
+      }
+
+    credit_costs:
+      "/predict/ner": 2.0
+      "/predict/sentiment": 1.5
+      "/detect-anomaly": 3.0
+      "/cluster": 2.5
+      "/recommend": 4.0
+
+  database_config:
+    pool_size: 30
+    max_overflow: 10 # Allow N extra connections
+    pool_timeout: 20 # Wait N seconds for connection
+    pool_recycle: 1800 # Recycle connections after 30 minutes
+    pool_pre_ping: true # Test connections before use
+    echo: false
+    expire_on_commit: false # False for async implementations
