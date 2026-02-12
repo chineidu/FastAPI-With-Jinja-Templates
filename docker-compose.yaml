@@ -16,7 +16,7 @@ services:
       #   target: /docker-entrypoint-initdb.d/init_databases.sh
       #   read_only: true
     healthcheck:
-      test: pg_isready -U ${POSTGRES_USER:-apigateway} -d ${POSTGRES_DB:-apigateway_db}
+      test: pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-my_db}
       interval: 5s
       retries: 5
     networks:

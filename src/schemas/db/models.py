@@ -23,14 +23,16 @@ class BaseUserSchema(BaseSchema):
     firstname: str = Field(description="First name of the user.")
     lastname: str = Field(description="Last name of the user.")
     username: str = Field(description="Unique username for the user.")
-    email: EmailStr
-    tier: TierEnum = Field(default=TierEnum.FREE)
+    email: EmailStr = Field(description="Email address of the user.")
+    tier: TierEnum = Field(default=TierEnum.FREE, description="The tier type")
     roles: list[RoleTypeEnum] = Field(default_factory=list)
     credits: float = Field(default=0.0, le=1_000_000.0, ge=0.0)
-    status: UserStatusEnum = Field(default=UserStatusEnum.ACTIVE)
-    is_active: bool = Field(default=True)
-    created_at: datetime | None = Field(default=None)
-    updated_at: datetime | None = Field(default=None)
+    status: UserStatusEnum = Field(default=UserStatusEnum.ACTIVE, description="Status of the guest user.")
+    is_active: bool = Field(default=True, description="Indicates if the guest user is active.")
+    created_at: datetime | None = Field(default=None, description="Creation date and time of the guest user.")
+    updated_at: datetime | None = Field(
+        default=None, description="Last update date and time of the guest user."
+    )
 
     @field_validator("roles", mode="before")
     @classmethod
@@ -64,24 +66,30 @@ class GuestUserSchema(BaseSchema):
     lastname: str = Field(default="User", description="Last name of the user.")
     username: str = Field(default="guest_user", description="Username for the guest user.")
     email: EmailStr = Field(default="guest@anonymous.local")
-    tier: TierEnum = Field(default=TierEnum.GUEST)
-    credits: float = Field(default=0.0)
-    status: UserStatusEnum = Field(default=UserStatusEnum.ACTIVE)
-    is_active: bool = Field(default=True)
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
+    tier: TierEnum = Field(default=TierEnum.GUEST, description="Tier of the guest user.")
+    credits: float = Field(default=0.0, description="Credits available for the guest user.")
+    status: UserStatusEnum = Field(default=UserStatusEnum.ACTIVE, description="Status of the guest user.")
+    is_active: bool = Field(default=True, description="Indicates if the guest user is active.")
+    created_at: datetime | None = Field(default=None, description="Creation date and time of the guest user.")
+    updated_at: datetime | None = Field(
+        default=None, description="Last update date and time of the guest user."
+    )
 
 
 class UserCreateSchema(BaseUserSchema):
     """Schema representing a database user with password."""
 
-    password: SecretStr
+    password: SecretStr = Field(
+        description="Plaintext password for the user. Will be hashed before storage.", min_length=8
+    )
 
     # Fetching and updating model config to add example
     _custom_model_config: ClassVar[ConfigDict] = BaseSchema.model_config.copy()
     _json_schema_extra: ClassVar[dict[str, Any]] = {
         "example": {
-            "name": "example_user",
+            "firstname": "example_firstname",
+            "lastname": "example_lastname",
+            "username": "example_username",
             "email": "user@example.com",
             "password": "securepassword123",
         }
