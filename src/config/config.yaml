@@ -7,9 +7,9 @@ config:
       ner: 10
 
   api_config:
-    title: ML Router API
+    title: Demo App API
     name: "${.title}"
-    description: A Learning-Focused API Router for Machine Learning Models
+    description: App for demonstrating FastAPI with Jinja templates.
     version: v1.0.0
     status: healthy
     prefix: /api/v1

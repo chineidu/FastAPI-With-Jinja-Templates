@@ -19,6 +19,7 @@ class ErrorCodeEnum(StrEnum):
     RESOURCES_NOT_FOUND = "resources_not_found"
     SERVICE_UNAVAILABLE = "service_unavailable"
     TIMEOUT_ERROR = "timeout_error"
+    UNAUTHORIZED = "unauthorized"
     UNEXPECTED_ERROR = "unexpected_error"
 
 

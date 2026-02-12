@@ -218,6 +218,7 @@ dependencies = [
     { name = "aiocache" },
     { name = "asyncpg" },
     { name = "fastapi", extra = ["standard"] },
+    { name = "greenlet" },
     { name = "gunicorn" },
     { name = "msgspec" },
     { name = "omegaconf" },
@@ -227,7 +228,13 @@ dependencies = [
     { name = "python-dateutil" },
     { name = "python-jose" },
     { name = "python-json-logger" },
+    { name = "redis" },
     { name = "sqlalchemy" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pyrefly" },
 ]
 
 [package.metadata]
@@ -235,6 +242,7 @@ requires-dist = [
     { name = "aiocache", specifier = ">=0.12.3" },
     { name = "asyncpg", specifier = ">=0.31.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.128.8" },
+    { name = "greenlet", specifier = ">=3.3.1" },
     { name = "gunicorn", specifier = ">=25.0.3" },
     { name = "msgspec", specifier = ">=0.20.0" },
     { name = "omegaconf", specifier = ">=2.3.0" },
@@ -244,8 +252,12 @@ requires-dist = [
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "python-jose", specifier = ">=3.5.0" },
     { name = "python-json-logger", specifier = ">=4.0.0" },
+    { name = "redis", specifier = ">=7.1.1" },
     { name = "sqlalchemy", specifier = ">=2.0.46" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pyrefly", specifier = ">=0.52.0" }]
 
 [[package]]
 name = "fastar"
@@ -714,6 +726,22 @@ wheels = [
 ]
 
 [[package]]
+name = "pyrefly"
+version = "0.52.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/93/bc/a65b3f8a04b941121868c07f1e65db223c1a101b6adf0ff3db5240ad24ea/pyrefly-0.52.0.tar.gz", hash = "sha256:abe022b68e67a2fd9adad4f8fe2deced2a786df32601b0eecbb00b40ea1f3b93", size = 4967100, upload-time = "2026-02-09T15:30:03.745Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e7/32/74a3b3ed6b38fef8aba3437e02824bf670b017123126bb83597c0aa42e98/pyrefly-0.52.0-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:90d7bf2fb812ee3a920a962da2aa2387e2f4109c62604e5be1a736046a3260c7", size = 11773462, upload-time = "2026-02-09T15:29:44.995Z" },
+    { url = "https://files.pythonhosted.org/packages/31/d4/efb4aecca57bc42871b3004af04324e637057902417d89757c4077474b98/pyrefly-0.52.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:848764fdbc474fd36412d7ccf230d13a12ab3b2c28968124d9e9d51df79b7b8e", size = 11355651, upload-time = "2026-02-09T15:29:46.992Z" },
+    { url = "https://files.pythonhosted.org/packages/d8/b9/80e0becaaafe0ca55b06868e942aa7f68a42644a156fdc7bedf2ae851d65/pyrefly-0.52.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:43b712830df1247798fb79f478a236b0ffbe5983bdde5eb2f5b99a9411e09f35", size = 31906389, upload-time = "2026-02-09T15:29:49.138Z" },
+    { url = "https://files.pythonhosted.org/packages/44/78/f6ff1e9c86eebad5feef97301789bb9ef22a5816931809cbb063e5e6acb9/pyrefly-0.52.0-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:baa4130c460ad7c8d7efcff9017b7bc74c71736c5959ebfc2b7e405c2ce07d5d", size = 34292755, upload-time = "2026-02-09T15:29:52.12Z" },
+    { url = "https://files.pythonhosted.org/packages/c6/d4/5798fbec917aa2481de9ed4dc550824383b115c67b57be2ca6da43a91850/pyrefly-0.52.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3297751b1b13ecb582af48c8798e0b652c41c33a7e4ed72676164b29561655f6", size = 36943447, upload-time = "2026-02-09T15:29:54.858Z" },
+    { url = "https://files.pythonhosted.org/packages/67/91/963f6afb1cc0fd020f925137d64f437b777fd31907ac34589e9a9f949069/pyrefly-0.52.0-py3-none-win32.whl", hash = "sha256:d24ed11ef5eab93625df0bb4e67f7f946208b2b0ed4359b78f69cabbc6f78e3d", size = 10836046, upload-time = "2026-02-09T15:29:57.661Z" },
+    { url = "https://files.pythonhosted.org/packages/be/e7/d2699327bef724d79b0afb11723497369a2876ec5715a78878abf49253dd/pyrefly-0.52.0-py3-none-win_amd64.whl", hash = "sha256:0e5bee368fbdce6430b7672304bc4e36f11bc3b72ad067cbfde934d380701a3b", size = 11622998, upload-time = "2026-02-09T15:29:59.595Z" },
+    { url = "https://files.pythonhosted.org/packages/ff/57/491936d2293fee8ef91c2d16a841022decfd0824d1eda37ea87e667c41b9/pyrefly-0.52.0-py3-none-win_arm64.whl", hash = "sha256:8cabc07740e90c0baea12a1e7c48d6422130a19331033e8d9a16dd63e7e90db0", size = 11131664, upload-time = "2026-02-09T15:30:01.957Z" },
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
@@ -800,6 +828,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/da/92/1446574745d74df0c92e6aa4a7b0b3130706a4142b2d1a5869f2eaa423c6/pyyaml-6.0.3-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:16249ee61e95f858e83976573de0f5b2893b3677ba71c9dd36b9cf8be9ac6d65", size = 829923, upload-time = "2025-09-25T21:32:54.537Z" },
     { url = "https://files.pythonhosted.org/packages/f0/7a/1c7270340330e575b92f397352af856a8c06f230aa3e76f86b39d01b416a/pyyaml-6.0.3-cp314-cp314t-win_amd64.whl", hash = "sha256:4ad1906908f2f5ae4e5a8ddfce73c320c2a1429ec52eafd27138b7f1cbe341c9", size = 174062, upload-time = "2025-09-25T21:32:55.767Z" },
     { url = "https://files.pythonhosted.org/packages/f1/12/de94a39c2ef588c7e6455cfbe7343d3b2dc9d6b6b2f40c4c6565744c873d/pyyaml-6.0.3-cp314-cp314t-win_arm64.whl", hash = "sha256:ebc55a14a21cb14062aa4162f906cd962b28e2e9ea38f9b4391244cd8de4ae0b", size = 149341, upload-time = "2025-09-25T21:32:56.828Z" },
+]
+
+[[package]]
+name = "redis"
+version = "7.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/80/2971931d27651affa88a44c0ad7b8c4a19dc29c998abb20b23868d319b59/redis-7.1.1.tar.gz", hash = "sha256:a2814b2bda15b39dad11391cc48edac4697214a8a5a4bd10abe936ab4892eb43", size = 4800064, upload-time = "2026-02-09T18:39:40.292Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/55/1de1d812ba1481fa4b37fb03b4eec0fcb71b6a0d44c04ea3482eb017600f/redis-7.1.1-py3-none-any.whl", hash = "sha256:f77817f16071c2950492c67d40b771fa493eb3fccc630a424a10976dbb794b7a", size = 356057, upload-time = "2026-02-09T18:39:38.602Z" },
 ]
 
 [[package]]

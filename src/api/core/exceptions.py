@@ -56,25 +56,10 @@ class HTTPError(BaseAPIError):
         )
 
 
-class CircuitOpenError(BaseAPIError):
-    """Exception raised when the circuit breaker is open and requests are blocked."""
-
-    def __init__(self, details: str, headers: dict[str, str] | None = None) -> None:
-        message = f"Circuit breaker open: {details}"
-        super().__init__(
-            message,
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            error_code=ErrorCodeEnum.CIRCUIT_OPEN_ERROR,
-            headers=headers,
-        )
-
-
 class ServiceUnavailableError(BaseAPIError):
     """Exception raised when no healthy service instances are available."""
 
-    def __init__(
-        self, service_name: str, headers: dict[str, str] | None = None
-    ) -> None:
+    def __init__(self, service_name: str, headers: dict[str, str] | None = None) -> None:
         message = f"No healthy instances available for service: {service_name}"
         super().__init__(
             message,
