@@ -1,0 +1,349 @@
+<!-- Inheriting from the base layout -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="blog-container">
+	<!-- Hero Section -->
+	<section class="hero-section mb-5">
+		<div class="row align-items-center">
+			<div class="col-md-8">
+				<h1 class="display-4 mb-3">Welcome to My Blog</h1>
+				<p class="lead text-muted mb-4">Exploring ideas, sharing knowledge, and discussing insights on various
+					topics.</p>
+			</div>
+			<div class="col-md-4 text-center">
+				<div class="hero-icon" style="font-size: 5rem;">📚</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Posts Grid Section -->
+	<section class="posts-section">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2 class="mb-0">Latest Posts</h2>
+			<div class="filter-info text-muted small">
+				<span id="postCount">{{ posts|length if posts else 0 }}</span> posts
+			</div>
+		</div>
+
+		{% if posts and posts|length > 0 %}
+		<div class="posts-grid">
+			{% for post in posts %}
+			<div class="post-card card">
+				<!-- Post Header with Metadata -->
+				<div class="card-header border-bottom py-3">
+					<div class="d-flex justify-content-between align-items-start gap-2">
+						<div>
+							<h5 class="card-title mb-2">
+								<a href="#" class="post-link"
+									style="color: var(--color-primary); text-decoration: none;">
+									{{ post.title }}
+								</a>
+							</h5>
+							<div class="post-meta small text-muted">
+								<span class="author">
+									<i class="icon-user"></i>
+									User #{{ post.user_id }}
+								</span>
+								<span class="separator">•</span>
+								<span class="published-date">
+									<i class="icon-calendar"></i>
+									{% if post.published_at %}
+									{{ post.published_at.strftime('%b %d, %Y') if post.published_at else 'Not published'
+									}}
+									{% else %}
+									Not published
+									{% endif %}
+								</span>
+							</div>
+						</div>
+						<!-- Badges -->
+						<div class="post-badges">
+							{% if post.is_pinned %}
+							<span class="badge badge-warning" title="Pinned post">
+								<i class="icon-pin"></i> Pinned
+							</span>
+							{% endif %}
+							<span class="badge badge-status badge-status-{{ post.status }}">
+								{{ post.status|title }}
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Post Content -->
+				<div class="card-body">
+					<p class="card-text text-muted post-excerpt">
+						{% if post.post|length > 200 %}
+						{{ post.post[:200] }}...
+						{% else %}
+						{{ post.post }}
+						{% endif %}
+					</p>
+
+					<!-- Tags -->
+					{% if post.tags and post.tags|length > 0 %}
+					<div class="tags-container mt-3 mb-3">
+						{% for tag in post.tags %}
+						<span class="badge badge-light"
+							style="background-color: var(--color-bg-secondary); border: 1px solid var(--color-border);">
+							<i class="icon-tag"></i> {{ tag }}
+						</span>
+						{% endfor %}
+					</div>
+					{% endif %}
+				</div>
+
+				<!-- Post Footer -->
+				<div class="card-footer border-top bg-transparent py-3">
+					<div class="d-flex justify-content-between align-items-center">
+						<small class="text-muted">
+							<i class="icon-document"></i>
+							Post ID: {{ post.id }}
+						</small>
+						{% if post.allow_comments %}
+						<a href="#" class="btn btn-sm btn-outline-primary">
+							<i class="icon-chat"></i> Comments
+						</a>
+						{% else %}
+						<small class="text-muted">
+							<i class="icon-close"></i> Comments disabled
+						</small>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+
+		<!-- Pagination / Load More -->
+		<div class="pagination-section mt-5 text-center">
+			<nav aria-label="Page navigation">
+				<ul class="pagination justify-content-center">
+					<li class="page-item disabled">
+						<a class="page-link" href="#" tabindex="-1">Previous</a>
+					</li>
+					<li class="page-item active">
+						<a class="page-link" href="#">1</a>
+					</li>
+					<li class="page-item">
+						<a class="page-link" href="#">2</a>
+					</li>
+					<li class="page-item">
+						<a class="page-link" href="#">Next</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+
+		{% else %}
+		<!-- Empty State -->
+		<div class="empty-state text-center py-5">
+			<div style="font-size: 4rem; margin-bottom: 20px;">📭</div>
+			<h4 class="text-muted">No posts yet</h4>
+			<p class="text-muted">Check back soon for new content!</p>
+		</div>
+		{% endif %}
+	</section>
+</div>
+
+<style>
+	/* Hero Section */
+	.hero-section {
+		padding: 40px 0;
+		border-bottom: 2px solid var(--color-border);
+	}
+
+	.hero-icon {
+		animation: float 3s ease-in-out infinite;
+	}
+
+	@keyframes float {
+
+		0%,
+		100% {
+			transform: translateY(0px);
+		}
+
+		50% {
+			transform: translateY(-20px);
+		}
+	}
+
+	/* Posts Grid */
+	.posts-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		gap: 24px;
+		margin-bottom: 40px;
+	}
+
+	@media (max-width: 768px) {
+		.posts-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	/* Post Card */
+	.post-card {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+		cursor: pointer;
+	}
+
+	.post-card:hover {
+		transform: translateY(-8px);
+		box-shadow: 0 8px 12px var(--color-card-shadow);
+	}
+
+	.post-card .card-header {
+		background-color: transparent;
+		padding: 1.5rem !important;
+	}
+
+	.post-card .card-body {
+		flex-grow: 1;
+		padding: 1.5rem;
+	}
+
+	.post-card .card-footer {
+		padding: 1rem 1.5rem;
+	}
+
+	/* Post Link */
+	.post-link {
+		transition: color 0.3s ease;
+	}
+
+	.post-link:hover {
+		color: var(--color-primary-dark) !important;
+	}
+
+	/* Post Meta */
+	.post-meta {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+
+	.post-meta .separator {
+		opacity: 0.5;
+	}
+
+	.post-meta span {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	/* Badges */
+	.post-badges {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+
+	.badge {
+		font-weight: 500;
+		padding: 6px 12px;
+		border-radius: 20px;
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.badge-warning {
+		background-color: #ffc107 !important;
+		color: #000 !important;
+	}
+
+	.badge-light {
+		background-color: var(--color-bg-secondary) !important;
+		color: var(--color-text) !important;
+	}
+
+	/* Tags Container */
+	.tags-container {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.tags-container .badge {
+		background-color: var(--color-bg-secondary) !important;
+		color: var(--color-text) !important;
+		border: 1px solid var(--color-border) !important;
+		padding: 4px 10px;
+		font-size: 0.7rem;
+	}
+
+	/* Post Excerpt */
+	.post-excerpt {
+		line-height: 1.6;
+		max-height: 90px;
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		-webkit-box-orient: vertical;
+	}
+
+	/* Empty State */
+	.empty-state {
+		padding: 60px 20px;
+		color: var(--color-text-muted);
+	}
+
+	/* Pagination */
+	.pagination-section {
+		margin-top: 60px;
+	}
+
+	.pagination .page-link {
+		background-color: var(--color-bg-secondary);
+		border-color: var(--color-border);
+		color: var(--color-text);
+		transition: all 0.3s ease;
+	}
+
+	.pagination .page-link:hover {
+		background-color: var(--color-primary);
+		border-color: var(--color-primary);
+		color: white;
+	}
+
+	.pagination .page-item.active .page-link {
+		background-color: var(--color-primary);
+		border-color: var(--color-primary);
+	}
+
+	.pagination .page-item.disabled .page-link {
+		background-color: var(--color-bg-secondary);
+		border-color: var(--color-border);
+		color: var(--color-text-muted);
+		cursor: not-allowed;
+	}
+
+	/* Responsive Typography */
+	@media (max-width: 576px) {
+		.hero-section h1 {
+			font-size: 2rem;
+		}
+
+		.post-card .card-title {
+			font-size: 1.1rem;
+		}
+
+		.post-badges {
+			justify-content: flex-start;
+		}
+	}
+</style>
+{% endblock %}

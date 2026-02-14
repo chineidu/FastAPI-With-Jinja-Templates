@@ -75,6 +75,8 @@ services:
       - ./src:/app/src:ro
       # Mount data directory for persistent storage
       - ./data:/app/data
+      # Mount uploads directory for file uploads
+      - ./uploads:/app/uploads
       # Mount Docker socket for service discovery via Docker API
       # SECURITY NOTE: This gives container access to Docker daemon
       # - For DEV/TESTING only - acceptable risk in local development

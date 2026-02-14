@@ -5,7 +5,7 @@ from uuid import uuid4
 from pydantic import ConfigDict, EmailStr, Field, SecretStr, field_validator
 
 from src.schemas.base import BaseSchema
-from src.schemas.types import APIKeyScopeEnum, RoleTypeEnum, TierEnum, UserStatusEnum
+from src.schemas.types import APIKeyScopeEnum, PostStatusEnum, RoleTypeEnum, TierEnum, UserStatusEnum
 
 
 class BaseUserSchema(BaseSchema):
@@ -147,7 +147,7 @@ class RoleSchema(BaseSchema):
     )
 
     id: int | None = Field(default=None, description="Unique identifier of the role.")
-    name: RoleTypeEnum
+    name: RoleTypeEnum = Field(description="Name of the role.")
     description: str | None = Field(default=None, description="Description of the role.")
     created_at: datetime | None = Field(default=None, description="Creation date and time of the role.")
     updated_at: datetime | None = Field(default=None, description="Last update date and time of the role.")
@@ -158,3 +158,58 @@ ROLES: dict[str, RoleSchema] = {
     "user": RoleSchema(name=RoleTypeEnum.USER, description="Regular user with standard access"),
     "guest": RoleSchema(name=RoleTypeEnum.GUEST, description="Guest user with limited access"),
 }
+
+
+class PostCreateSchema(BaseSchema):
+    """Schema representing a blog post."""
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={datetime: lambda v: v.isoformat() if v else None},
+    )
+    title: str = Field(description="Title of the post.")
+    post: str = Field(description="Content of the post.")
+    tags: list[str] = Field(default_factory=list, description="List of tags associated with the post.")
+    allow_comments: bool = Field(default=True, description="Indicates if comments are allowed on the post.")
+
+    # Fetching and updating model config to add example
+    _custom_model_config: ClassVar[ConfigDict] = BaseSchema.model_config.copy()
+    _json_schema_extra: ClassVar[dict[str, Any]] = {
+        "example": {
+            "title": "My First Post",
+            "post": "This is the content of my first post.",
+            "tags": ["introduction", "welcome"],
+            "allow_comments": True,
+        }
+    }
+    _custom_model_config.update({"json_schema_extra": _json_schema_extra})
+    model_config = _custom_model_config
+
+
+class PostSchema(PostCreateSchema):
+    """Schema representing a blog post."""
+
+    id: int | None = Field(default=None, description="Unique identifier of the post.")
+    user_id: int = Field(description="ID of the user who created the post.")
+    author: str | None = Field(default="Anonymous", description="Username of the author.")
+    slug: str = Field(description="URL-friendly slug for the post.")
+    status: PostStatusEnum = Field(
+        default=PostStatusEnum.DRAFT, description="Publication status of the post."
+    )
+    allow_comments: bool = Field(default=True, description="Indicates if comments are allowed on the post.")
+    is_pinned: bool = Field(
+        default=False, description="Indicates if the post is pinned to the top of the list."
+    )
+    published_at: datetime | None = Field(
+        default_factory=datetime.now, description="Publication date and time of the post."
+    )
+    updated_at: datetime | None = Field(default=None, description="Last update date and time of the post.")
+    deleted_at: datetime | None = Field(default=None, description="Deletion date and time of the post.")
+
+    @field_validator("status", mode="before")
+    @classmethod
+    def convert_status(cls, v: Any) -> PostStatusEnum:
+        """Convert string to PostStatusEnum."""
+        if isinstance(v, str):
+            return PostStatusEnum(v)
+        return v

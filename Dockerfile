@@ -41,7 +41,9 @@ RUN groupadd -r appuser \
 WORKDIR /app
 
 # Create directories that the app needs to write to, with proper ownership
-RUN mkdir -p models \
+# Use 777 permissions for uploaded files directory so macOS can access them
+RUN mkdir -p models uploads \
+    && chmod 777 uploads \
     && chown -R appuser:appuser models
 
 # Copy pre-built virtual environment from builder stage

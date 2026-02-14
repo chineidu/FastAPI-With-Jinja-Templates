@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Final
+from typing import Final, TypedDict
 
 
 class EnvironmentEnum(StrEnum):
@@ -113,3 +113,14 @@ DANGEROUS_SCOPES: Final = frozenset(
         APIKeyScopeEnum.API_KEYS_MANAGE,
     ]
 )
+
+
+class PostStatusEnum(StrEnum):
+    DRAFT = "draft"
+    PUBLISHED = "published"
+    ARCHIVED = "archived"
+
+
+class DocumentValidationResult(TypedDict):
+    valid: bool
+    errors: list[str]

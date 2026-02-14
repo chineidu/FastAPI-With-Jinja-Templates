@@ -16,6 +16,7 @@ from sqlalchemy import (
     Numeric,
     String,
     Table,
+    Text,
     func,
 )
 from sqlalchemy.ext.asyncio.session import AsyncSession
@@ -71,15 +72,17 @@ class DBUser(Base):
         DateTime(timezone=True), nullable=True, default=func.now(), onupdate=func.now()
     )
 
-    # Relationship: Enables Python-side navigation (e.g. my_user_instance.api_keys)
+    # --- Relationships ---
+    # Enables Python-side navigation (e.g. my_user_instance.api_keys)
     # Note: This does not create a column in the 'users' database table.
     # When retrieving, use selectinload(DBUser.api_keys) to eager load api_keys
     api_keys: Mapped[list["DBAPIKey"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     # Enables Python-side navigation for roles (e.g. my_user_instance.roles)
-    # Note: This does not create a column in the 'users' database table.
-    # Many-to-many relationship with roles (through user_roles association table)
     roles = relationship("DBRole", secondary=user_roles, back_populates="users")
+
+    # Enables Python-side navigation for posts (e.g. my_user_instance.posts)
+    posts: Mapped[list["DBPost"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     # Composite index for optimized queries
     __table_args__ = (Index("ix_users_status_created_at", "status", "created_at"),)
@@ -121,6 +124,7 @@ class DBAPIKey(Base):
 
     # Relationship: Enables Python-side navigation (e.g. my_api_key_instance.user)
     # Note: This does not create a column in the 'api_keys' database table.
+    # With this, you can access the user of an api_key via api_key_instance.user
     user: Mapped["DBUser"] = relationship(back_populates="api_keys")
 
     # Composite index for optimized queries
@@ -137,6 +141,52 @@ class DBAPIKey(Base):
         return (
             f"{self.__class__.__name__}(id={self.id!r}, name={self.name!r}, "
             f"requests_per_minute={self.requests_per_minute!r})"
+        )
+
+
+class DBPost(Base):
+    """Data model for storing posts information."""
+
+    __tablename__: str = "posts"
+
+    id: Mapped[int] = mapped_column("id", primary_key=True)
+    # Foreign key to DBUser.id, unique=False to allow multiple posts per user
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    post: Mapped[str] = mapped_column(Text, nullable=False)
+    tags: Mapped[list[str]] = mapped_column(JSON, nullable=True, default=list)
+    slug: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="draft")
+    allow_comments: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    is_pinned: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # Timestamps
+    published_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=func.now(), onupdate=func.now()
+    )
+    deleted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Relationship: Enables Python-side navigation (e.g. my_post_instance.user)
+    # Note: This does not create a column in the 'posts' database table.
+    # With this, you can access the user of a post via post_instance.user
+    user: Mapped["DBUser"] = relationship(back_populates="posts")
+
+    # Composite index for optimized queries
+    __table_args__ = (Index("ix_posts_user_id_published_at", "user_id", "published_at"),)
+
+    def __repr__(self) -> str:
+        """
+        Returns a string representation of the Post object.
+
+        Returns
+        -------
+        str
+        """
+        return (
+            f"{self.__class__.__name__}(user_id={self.user_id!r}, title={self.title!r}, "
+            f"post={self.post[:100]!r}, tags={self.tags!r})"
         )
 
 

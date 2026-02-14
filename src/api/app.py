@@ -7,12 +7,13 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from src import create_logger
 from src.api.core.exceptions import BaseAPIError, api_error_handler
 from src.api.core.lifespan import lifespan
 from src.api.core.middleware import MIDDLEWARE_STACK
-from src.api.routes import auth, health
+from src.api.routes import auth, health, pages, posts, root
 
 # from src.api.routes import proxy
 from src.config import app_config, app_settings
@@ -75,6 +76,16 @@ def create_application() -> FastAPI:
     app.include_router(auth.router, prefix=auth_prefix)
     # Other routes
     app.include_router(health.router, prefix=prefix)
+    app.include_router(posts.router, prefix=prefix)
+    app.include_router(root.router, prefix=prefix)
+    # Simple page routes (mounted at app root, e.g. /login, /signup)
+    app.include_router(pages.router)
+
+    # Mount static files (CSS, JS, images, fonts)
+    app.mount("/css", StaticFiles(directory="src/static/css"), name="css")
+    app.mount("/js", StaticFiles(directory="src/static/js"), name="js")
+    app.mount("/fonts", StaticFiles(directory="src/static/fonts"), name="fonts")
+    app.mount("/images", StaticFiles(directory="src/static/images"), name="images")
 
     # Add exception handlers
     app.add_exception_handler(BaseAPIError, api_error_handler)  # type: ignore

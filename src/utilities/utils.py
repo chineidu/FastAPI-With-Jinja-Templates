@@ -1,4 +1,6 @@
 import hashlib
+import re
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 import msgspec
@@ -63,3 +65,14 @@ def calculate_latency_ewma(old_latency: float | None, current_latency: float, al
 
     new_latency = (alpha * current_latency) + ((1 - alpha) * old_latency)
     return round(new_latency, 2)
+
+
+def make_slug(title: str) -> str:
+    """Convert a title string into a URL-friendly slug."""
+    now = datetime.now().isoformat(timespec="seconds")
+
+    # Replace non-alphanumeric characters with hyphens and limit length to 150 characters
+    _string = re.sub(r"[^a-z0-9]+", "-", title.lower()[:150])
+    # Remove leading/trailing hyphens 
+    _string: str = re.sub(r"-+", "-", _string).strip("-")
+    return f"{_string}-{now.lower().replace(':', '-').replace('.', '-')}" or "post"
